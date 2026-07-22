@@ -65,12 +65,12 @@ def place_collectible(grid: list[list[str]], row: int, col: int) -> None:
     grid[row][col] = COLLECTIBLE_EMOJI
 
 
-def spawn_collectible(player_row: int, player_col: int, grid_size: int) -> tuple[int, int]:
-    """Return a random position for the collectible that is not on the player."""
+def spawn_collectible(player_row: int, player_col: int, hazard_row: int, hazard_col: int, grid_size: int) -> tuple[int, int]:
+    """Return a random position for the collectible that is not on the player or hazard."""
     while True:
         row = random.randint(0, grid_size - 1)
         col = random.randint(0, grid_size - 1)
-        if row != player_row or col != player_col:
+        if (row, col) != (player_row, player_col) and (row, col) != (hazard_row, hazard_col):
             return row, col
 
 
@@ -129,7 +129,7 @@ def game_loop() -> None:
         score = 0
 
         # Spawn the first collectible
-        collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
+        collectible_row, collectible_col = spawn_collectible(player_row, player_col, -1, -1, GRID_SIZE)
 
         # Spawn the hazard
         hazard_row, hazard_col = spawn_hazard(player_row, player_col, collectible_row, collectible_col, GRID_SIZE)
@@ -187,7 +187,7 @@ def game_loop() -> None:
                         game_active = False
                     else:
                         # Respawn collectible
-                        collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
+                        collectible_row, collectible_col = spawn_collectible(player_row, player_col, hazard_row, hazard_col, GRID_SIZE)
 
         # Ask to play again
         play_again = input("\nPlay again? (y/n): ")

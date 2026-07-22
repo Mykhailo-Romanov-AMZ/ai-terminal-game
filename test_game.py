@@ -122,14 +122,21 @@ def test_place_collectible_on_grid():
 def test_spawn_collectible_not_on_player():
     """The collectible should never spawn on the player's position."""
     for _ in range(50):
-        row, col = spawn_collectible(2, 2, GRID_SIZE)
+        row, col = spawn_collectible(2, 2, 4, 4, GRID_SIZE)
         assert (row, col) != (2, 2)
+
+
+def test_spawn_collectible_not_on_hazard():
+    """The collectible should never spawn on the hazard's position."""
+    for _ in range(50):
+        row, col = spawn_collectible(0, 0, 3, 3, GRID_SIZE)
+        assert (row, col) != (3, 3)
 
 
 def test_spawn_collectible_within_grid():
     """The collectible should always be within grid bounds."""
     for _ in range(50):
-        row, col = spawn_collectible(0, 0, GRID_SIZE)
+        row, col = spawn_collectible(0, 0, 4, 4, GRID_SIZE)
         assert 0 <= row < GRID_SIZE
         assert 0 <= col < GRID_SIZE
 
