@@ -1,8 +1,8 @@
 """
-Tests for game.py — verifies grid creation, player placement, and movement.
+Tests for game.py — verifies grid creation, player placement, movement, and collectibles.
 """
 
-from game import create_grid, place_player, handle_move, GRID_SIZE
+from game import create_grid, place_player, place_collectible, spawn_collectible, handle_move, GRID_SIZE
 
 
 def test_grid_is_5x5():
@@ -103,3 +103,28 @@ def test_cannot_move_right_of_grid():
     row, col = handle_move("d", 2, GRID_SIZE - 1, GRID_SIZE)
     assert row == 2
     assert col == GRID_SIZE - 1
+
+
+# --- Collectible tests ---
+
+
+def test_place_collectible_on_grid():
+    """The collectible should appear as * on the grid."""
+    grid = create_grid(GRID_SIZE)
+    place_collectible(grid, 2, 3)
+    assert grid[2][3] == "*"
+
+
+def test_spawn_collectible_not_on_player():
+    """The collectible should never spawn on the player's position."""
+    for _ in range(50):
+        row, col = spawn_collectible(2, 2, GRID_SIZE)
+        assert (row, col) != (2, 2)
+
+
+def test_spawn_collectible_within_grid():
+    """The collectible should always be within grid bounds."""
+    for _ in range(50):
+        row, col = spawn_collectible(0, 0, GRID_SIZE)
+        assert 0 <= row < GRID_SIZE
+        assert 0 <= col < GRID_SIZE
