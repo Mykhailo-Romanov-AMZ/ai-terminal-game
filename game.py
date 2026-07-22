@@ -1,7 +1,10 @@
 """
 A simple text-based game on a 5x5 grid.
 Player starts at position (0, 0) — top-left corner.
+Use WASD to move: W=up, A=left, S=down, D=right.
 """
+
+import os
 
 # Grid dimensions
 GRID_SIZE = 5
@@ -26,23 +29,52 @@ def draw_grid(grid: list[list[str]]) -> None:
         print(" ".join(row))
 
 
+def handle_move(direction: str, player_row: int, player_col: int, grid_size: int) -> tuple[int, int]:
+    """Return the new position after moving in the given direction.
+    If the move would go outside the grid, stay put."""
+    new_row = player_row
+    new_col = player_col
+
+    if direction == "w":
+        new_row = player_row - 1
+    elif direction == "s":
+        new_row = player_row + 1
+    elif direction == "a":
+        new_col = player_col - 1
+    elif direction == "d":
+        new_col = player_col + 1
+
+    # Boundary check — only move if still inside the grid
+    if 0 <= new_row < grid_size and 0 <= new_col < grid_size:
+        return new_row, new_col
+    else:
+        return player_row, player_col
+
+
 def game_loop() -> None:
     """Main game loop."""
     player_row = 0
     player_col = 0
 
     while True:
+        # Clear the terminal
+        os.system("clear")
+
         # Build and draw the grid
         grid = create_grid(GRID_SIZE)
         place_player(grid, player_row, player_col)
         draw_grid(grid)
 
         # Wait for user input
-        user_input = input("Enter 'q' to quit: ")
+        user_input = input("Move (WASD) or 'q' to quit: ")
 
         if user_input == "q":
             print("Goodbye!")
             break
+
+        # Handle movement
+        if user_input in ("w", "a", "s", "d"):
+            player_row, player_col = handle_move(user_input, player_row, player_col, GRID_SIZE)
 
 
 if __name__ == "__main__":
