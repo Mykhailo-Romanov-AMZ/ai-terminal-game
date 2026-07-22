@@ -91,7 +91,7 @@ def spawn_hazard(player_row: int, player_col: int, collectible_row: int, collect
 def draw_grid(grid: list[list[str]]) -> None:
     """Draw the grid to the terminal."""
     for row in grid:
-        print(" ".join(row))
+        print("  ".join(row))
 
 
 def handle_move(direction: str, player_row: int, player_col: int, grid_size: int) -> tuple[int, int]:
