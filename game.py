@@ -1,13 +1,17 @@
 """
-A simple text-based game on a 5x5 grid.
-Player starts at position (0, 0) — top-left corner.
+Score with Messi
+A text-based game on a 5x5 grid.
+Messi tries to score all the goals in universe.
 Use WASD to move: W=up, A=left, S=down, D=right.
-Collect the item (*) to score points. Reach 10 to win!
-Avoid the hazard (X) or it's game over!
+Collect footballs to score. Avoid Lamine Yamal!
 """
 
 import os
 import random
+
+# Game info
+GAME_NAME = "Score with Messi"
+STORY_INTRO = "Messi tries to score all the goals in universe"
 
 # Grid dimensions
 GRID_SIZE = 5
@@ -15,23 +19,50 @@ GRID_SIZE = 5
 # Win condition
 WIN_SCORE = 10
 
+# Emojis
+PLAYER_EMOJI = "⭐"
+COLLECTIBLE_EMOJI = "⚽"
+HAZARD_EMOJI = "💀"
+EMPTY_EMOJI = "·"
+
+# Messages
+WIN_MESSAGE = "Yes, Messi the Champion!"
+LOSE_MESSAGE = "Youth Wins... for now"
+
+
+def show_intro() -> None:
+    """Display the game name and story intro."""
+    os.system("clear")
+    print("=" * 40)
+    print(f"  {GAME_NAME}")
+    print("=" * 40)
+    print()
+    print(f"  {STORY_INTRO}")
+    print()
+    print(f"  Use WASD to move.")
+    print(f"  Collect {COLLECTIBLE_EMOJI} to score {WIN_SCORE} goals.")
+    print(f"  Avoid {HAZARD_EMOJI}!")
+    print()
+    print("=" * 40)
+    input("  Press Enter to start...")
+
 
 def create_grid(size: int) -> list[list[str]]:
     """Create an empty grid filled with dots."""
     grid: list[list[str]] = []
     for row in range(size):
-        grid.append(["."] * size)
+        grid.append([EMPTY_EMOJI] * size)
     return grid
 
 
 def place_player(grid: list[list[str]], row: int, col: int) -> None:
     """Place the player marker on the grid at the given position."""
-    grid[row][col] = "P"
+    grid[row][col] = PLAYER_EMOJI
 
 
 def place_collectible(grid: list[list[str]], row: int, col: int) -> None:
     """Place the collectible marker on the grid."""
-    grid[row][col] = "*"
+    grid[row][col] = COLLECTIBLE_EMOJI
 
 
 def spawn_collectible(player_row: int, player_col: int, grid_size: int) -> tuple[int, int]:
@@ -45,7 +76,7 @@ def spawn_collectible(player_row: int, player_col: int, grid_size: int) -> tuple
 
 def place_hazard(grid: list[list[str]], row: int, col: int) -> None:
     """Place the hazard marker on the grid."""
-    grid[row][col] = "X"
+    grid[row][col] = HAZARD_EMOJI
 
 
 def spawn_hazard(player_row: int, player_col: int, collectible_row: int, collectible_col: int, grid_size: int) -> tuple[int, int]:
@@ -87,6 +118,8 @@ def handle_move(direction: str, player_row: int, player_col: int, grid_size: int
 
 def game_loop() -> None:
     """Main game loop."""
+    show_intro()
+
     playing = True
 
     while playing:
@@ -108,6 +141,7 @@ def game_loop() -> None:
             os.system("clear")
 
             # Display score
+            print(f"{GAME_NAME}")
             print(f"Score: {score}/{WIN_SCORE}")
             print()
 
@@ -134,7 +168,7 @@ def game_loop() -> None:
                     os.system("clear")
                     print(f"Score: {score}/{WIN_SCORE}")
                     print()
-                    print("Game Over!")
+                    print(LOSE_MESSAGE)
                     game_active = False
 
                 # Check if player collected the item
@@ -149,7 +183,7 @@ def game_loop() -> None:
                         grid = create_grid(GRID_SIZE)
                         place_player(grid, player_row, player_col)
                         draw_grid(grid)
-                        print("\nYou win! Congratulations!")
+                        print(f"\n{WIN_MESSAGE}")
                         game_active = False
                     else:
                         # Respawn collectible

@@ -2,7 +2,11 @@
 Tests for game.py — verifies grid creation, player placement, movement, collectibles, and hazards.
 """
 
-from game import create_grid, place_player, place_collectible, spawn_collectible, place_hazard, spawn_hazard, handle_move, GRID_SIZE
+from game import (
+    create_grid, place_player, place_collectible, spawn_collectible,
+    place_hazard, spawn_hazard, handle_move, GRID_SIZE,
+    PLAYER_EMOJI, COLLECTIBLE_EMOJI, HAZARD_EMOJI, EMPTY_EMOJI
+)
 
 
 def test_grid_is_5x5():
@@ -16,11 +20,11 @@ def test_grid_is_5x5():
 
 
 def test_grid_is_filled_with_dots():
-    """Every cell in a fresh grid should be a dot."""
+    """Every cell in a fresh grid should be empty."""
     grid = create_grid(GRID_SIZE)
     for row in grid:
         for cell in row:
-            assert cell == "."
+            assert cell == EMPTY_EMOJI
 
 
 def test_player_starts_at_origin():
@@ -29,19 +33,19 @@ def test_player_starts_at_origin():
     player_row = 0
     player_col = 0
     place_player(grid, player_row, player_col)
-    # The top-left cell should be "P"
-    assert grid[0][0] == "P"
+    # The top-left cell should be the player emoji
+    assert grid[0][0] == PLAYER_EMOJI
 
 
 def test_player_only_occupies_one_cell():
-    """Only one cell should be the player, the rest should be dots."""
+    """Only one cell should be the player, the rest should be empty."""
     grid = create_grid(GRID_SIZE)
     place_player(grid, 0, 0)
-    # Count how many cells contain "P"
+    # Count how many cells contain the player emoji
     p_count = 0
     for row in grid:
         for cell in row:
-            if cell == "P":
+            if cell == PLAYER_EMOJI:
                 p_count += 1
     assert p_count == 1
 
@@ -109,10 +113,10 @@ def test_cannot_move_right_of_grid():
 
 
 def test_place_collectible_on_grid():
-    """The collectible should appear as * on the grid."""
+    """The collectible should appear on the grid."""
     grid = create_grid(GRID_SIZE)
     place_collectible(grid, 2, 3)
-    assert grid[2][3] == "*"
+    assert grid[2][3] == COLLECTIBLE_EMOJI
 
 
 def test_spawn_collectible_not_on_player():
@@ -134,10 +138,10 @@ def test_spawn_collectible_within_grid():
 
 
 def test_place_hazard_on_grid():
-    """The hazard should appear as X on the grid."""
+    """The hazard should appear on the grid."""
     grid = create_grid(GRID_SIZE)
     place_hazard(grid, 3, 4)
-    assert grid[3][4] == "X"
+    assert grid[3][4] == HAZARD_EMOJI
 
 
 def test_place_hazard_only_occupies_one_cell():
@@ -147,7 +151,7 @@ def test_place_hazard_only_occupies_one_cell():
     x_count = 0
     for row in grid:
         for cell in row:
-            if cell == "X":
+            if cell == HAZARD_EMOJI:
                 x_count += 1
     assert x_count == 1
 
@@ -179,5 +183,5 @@ def test_hazard_does_not_overwrite_player():
     grid = create_grid(GRID_SIZE)
     place_player(grid, 1, 1)
     place_hazard(grid, 3, 3)
-    assert grid[1][1] == "P"
-    assert grid[3][3] == "X"
+    assert grid[1][1] == PLAYER_EMOJI
+    assert grid[3][3] == HAZARD_EMOJI
