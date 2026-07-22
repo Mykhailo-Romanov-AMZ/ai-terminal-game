@@ -3,6 +3,7 @@ A simple text-based game on a 5x5 grid.
 Player starts at position (0, 0) — top-left corner.
 Use WASD to move: W=up, A=left, S=down, D=right.
 Collect the item (*) to score points. Reach 10 to win!
+Avoid the hazard (X) or it's game over!
 """
 
 import os
@@ -39,6 +40,20 @@ def spawn_collectible(player_row: int, player_col: int, grid_size: int) -> tuple
         row = random.randint(0, grid_size - 1)
         col = random.randint(0, grid_size - 1)
         if row != player_row or col != player_col:
+            return row, col
+
+
+def place_hazard(grid: list[list[str]], row: int, col: int) -> None:
+    """Place the hazard marker on the grid."""
+    grid[row][col] = "X"
+
+
+def spawn_hazard(player_row: int, player_col: int, collectible_row: int, collectible_col: int, grid_size: int) -> tuple[int, int]:
+    """Return a random position for the hazard that is not on the player or collectible."""
+    while True:
+        row = random.randint(0, grid_size - 1)
+        col = random.randint(0, grid_size - 1)
+        if (row, col) != (player_row, player_col) and (row, col) != (collectible_row, collectible_col):
             return row, col
 
 
@@ -79,6 +94,9 @@ def game_loop() -> None:
     # Spawn the first collectible
     collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
 
+    # Spawn the hazard
+    hazard_row, hazard_col = spawn_hazard(player_row, player_col, collectible_row, collectible_col, GRID_SIZE)
+
     while True:
         # Clear the terminal
         os.system("clear")
@@ -90,6 +108,7 @@ def game_loop() -> None:
         # Build and draw the grid
         grid = create_grid(GRID_SIZE)
         place_collectible(grid, collectible_row, collectible_col)
+        place_hazard(grid, hazard_row, hazard_col)
         place_player(grid, player_row, player_col)
         draw_grid(grid)
 
@@ -103,6 +122,14 @@ def game_loop() -> None:
         # Handle movement
         if user_input in ("w", "a", "s", "d"):
             player_row, player_col = handle_move(user_input, player_row, player_col, GRID_SIZE)
+
+            # Check if player hit the hazard
+            if player_row == hazard_row and player_col == hazard_col:
+                os.system("clear")
+                print(f"Score: {score}/{WIN_SCORE}")
+                print()
+                print("Game Over!")
+                break
 
             # Check if player collected the item
             if player_row == collectible_row and player_col == collectible_col:

@@ -1,8 +1,8 @@
 """
-Tests for game.py — verifies grid creation, player placement, movement, and collectibles.
+Tests for game.py — verifies grid creation, player placement, movement, collectibles, and hazards.
 """
 
-from game import create_grid, place_player, place_collectible, spawn_collectible, handle_move, GRID_SIZE
+from game import create_grid, place_player, place_collectible, spawn_collectible, place_hazard, spawn_hazard, handle_move, GRID_SIZE
 
 
 def test_grid_is_5x5():
@@ -128,3 +128,56 @@ def test_spawn_collectible_within_grid():
         row, col = spawn_collectible(0, 0, GRID_SIZE)
         assert 0 <= row < GRID_SIZE
         assert 0 <= col < GRID_SIZE
+
+
+# --- Hazard tests ---
+
+
+def test_place_hazard_on_grid():
+    """The hazard should appear as X on the grid."""
+    grid = create_grid(GRID_SIZE)
+    place_hazard(grid, 3, 4)
+    assert grid[3][4] == "X"
+
+
+def test_place_hazard_only_occupies_one_cell():
+    """Only one cell should be the hazard when placed."""
+    grid = create_grid(GRID_SIZE)
+    place_hazard(grid, 2, 2)
+    x_count = 0
+    for row in grid:
+        for cell in row:
+            if cell == "X":
+                x_count += 1
+    assert x_count == 1
+
+
+def test_spawn_hazard_not_on_player():
+    """The hazard should never spawn on the player's position."""
+    for _ in range(50):
+        row, col = spawn_hazard(2, 2, 4, 4, GRID_SIZE)
+        assert (row, col) != (2, 2)
+
+
+def test_spawn_hazard_not_on_collectible():
+    """The hazard should never spawn on the collectible's position."""
+    for _ in range(50):
+        row, col = spawn_hazard(0, 0, 3, 3, GRID_SIZE)
+        assert (row, col) != (3, 3)
+
+
+def test_spawn_hazard_within_grid():
+    """The hazard should always spawn within grid bounds."""
+    for _ in range(50):
+        row, col = spawn_hazard(0, 0, 1, 1, GRID_SIZE)
+        assert 0 <= row < GRID_SIZE
+        assert 0 <= col < GRID_SIZE
+
+
+def test_hazard_does_not_overwrite_player():
+    """Placing the hazard should not overwrite the player on the grid."""
+    grid = create_grid(GRID_SIZE)
+    place_player(grid, 1, 1)
+    place_hazard(grid, 3, 3)
+    assert grid[1][1] == "P"
+    assert grid[3][3] == "X"
