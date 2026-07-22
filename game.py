@@ -87,67 +87,78 @@ def handle_move(direction: str, player_row: int, player_col: int, grid_size: int
 
 def game_loop() -> None:
     """Main game loop."""
-    player_row = 0
-    player_col = 0
-    score = 0
+    playing = True
 
-    # Spawn the first collectible
-    collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
+    while playing:
+        # Reset game state for a new game
+        player_row = 0
+        player_col = 0
+        score = 0
 
-    # Spawn the hazard
-    hazard_row, hazard_col = spawn_hazard(player_row, player_col, collectible_row, collectible_col, GRID_SIZE)
+        # Spawn the first collectible
+        collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
 
-    while True:
-        # Clear the terminal
-        os.system("clear")
+        # Spawn the hazard
+        hazard_row, hazard_col = spawn_hazard(player_row, player_col, collectible_row, collectible_col, GRID_SIZE)
 
-        # Display score
-        print(f"Score: {score}/{WIN_SCORE}")
-        print()
+        game_active = True
 
-        # Build and draw the grid
-        grid = create_grid(GRID_SIZE)
-        place_collectible(grid, collectible_row, collectible_col)
-        place_hazard(grid, hazard_row, hazard_col)
-        place_player(grid, player_row, player_col)
-        draw_grid(grid)
+        while game_active:
+            # Clear the terminal
+            os.system("clear")
 
-        # Wait for user input
-        user_input = input("\nMove (WASD) or 'q' to quit: ")
+            # Display score
+            print(f"Score: {score}/{WIN_SCORE}")
+            print()
 
-        if user_input == "q":
-            print("Goodbye!")
-            break
+            # Build and draw the grid
+            grid = create_grid(GRID_SIZE)
+            place_collectible(grid, collectible_row, collectible_col)
+            place_hazard(grid, hazard_row, hazard_col)
+            place_player(grid, player_row, player_col)
+            draw_grid(grid)
 
-        # Handle movement
-        if user_input in ("w", "a", "s", "d"):
-            player_row, player_col = handle_move(user_input, player_row, player_col, GRID_SIZE)
+            # Wait for user input
+            user_input = input("\nMove (WASD) or 'q' to quit: ")
 
-            # Check if player hit the hazard
-            if player_row == hazard_row and player_col == hazard_col:
-                os.system("clear")
-                print(f"Score: {score}/{WIN_SCORE}")
-                print()
-                print("Game Over!")
-                break
+            if user_input == "q":
+                print("Goodbye!")
+                return
 
-            # Check if player collected the item
-            if player_row == collectible_row and player_col == collectible_col:
-                score += 1
+            # Handle movement
+            if user_input in ("w", "a", "s", "d"):
+                player_row, player_col = handle_move(user_input, player_row, player_col, GRID_SIZE)
 
-                # Check win condition
-                if score >= WIN_SCORE:
+                # Check if player hit the hazard
+                if player_row == hazard_row and player_col == hazard_col:
                     os.system("clear")
                     print(f"Score: {score}/{WIN_SCORE}")
                     print()
-                    grid = create_grid(GRID_SIZE)
-                    place_player(grid, player_row, player_col)
-                    draw_grid(grid)
-                    print("\nYou win! Congratulations!")
-                    break
+                    print("Game Over!")
+                    game_active = False
 
-                # Respawn collectible
-                collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
+                # Check if player collected the item
+                elif player_row == collectible_row and player_col == collectible_col:
+                    score += 1
+
+                    # Check win condition
+                    if score >= WIN_SCORE:
+                        os.system("clear")
+                        print(f"Score: {score}/{WIN_SCORE}")
+                        print()
+                        grid = create_grid(GRID_SIZE)
+                        place_player(grid, player_row, player_col)
+                        draw_grid(grid)
+                        print("\nYou win! Congratulations!")
+                        game_active = False
+                    else:
+                        # Respawn collectible
+                        collectible_row, collectible_col = spawn_collectible(player_row, player_col, GRID_SIZE)
+
+        # Ask to play again
+        play_again = input("\nPlay again? (y/n): ")
+        if play_again != "y":
+            playing = False
 
 
 if __name__ == "__main__":
